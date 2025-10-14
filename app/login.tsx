@@ -191,7 +191,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -225,9 +225,9 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   input: {
-    backgroundColor: '#8a2a3c',
+    backgroundColor: '#6ba3bb',
     borderWidth: 1,
-    borderColor: '#6b1e2f',
+    borderColor: '#5a8fa5',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   proceedButton: {
-    backgroundColor: '#6b1e2f',
+    backgroundColor: '#5a8fa5',
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 8,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   modalCard: {
     width: '100%',
     maxWidth: 360,
-    backgroundColor: '#8a2a3c',
+    backgroundColor: '#6ba3bb',
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalButton: {
-    backgroundColor: '#6b1e2f',
+    backgroundColor: '#5a8fa5',
     paddingVertical: 12,
     borderRadius: 8,
   },

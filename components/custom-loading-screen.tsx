@@ -6,12 +6,12 @@ interface CustomLoadingScreenProps {
     message?: string;
 }
 
-export function CustomLoadingScreen({ message = "Loading EA Migrate..." }: CustomLoadingScreenProps) {
+export function CustomLoadingScreen({ message = "Loading EA Vault..." }: CustomLoadingScreenProps) {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <RobotLogo size={120} />
-                <Text style={styles.title}>EA MIGRATE</Text>
+                <Text style={styles.title}>EA VAULT</Text>
                 <Text style={styles.message}>{message}</Text>
 
                 {/* Loading dots animation */}

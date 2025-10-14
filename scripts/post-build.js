@@ -7,9 +7,9 @@ const assetsPath = path.join(__dirname, '..', 'assets', 'images');
 
 // Create manifest.json
 const manifest = {
-  "name": "EA Migrate",
-  "short_name": "EA Migrate",
-  "description": "Automated Forex Trading EA Migrate App",
+  "name": "EA Vault",
+  "short_name": "EA Vault",
+  "description": "Automated Forex Trading EA Vault App",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -90,7 +90,7 @@ if (fs.existsSync(indexPath)) {
   <link rel="manifest" href="/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="EA Migrate">
+  <meta name="apple-mobile-web-app-title" content="EA Vault">
   <link rel="apple-touch-icon" href="/assets/images/icon.png">
   <link rel="apple-touch-icon" sizes="57x57" href="/assets/images/icon.png">
   <link rel="apple-touch-icon" sizes="60x60" href="/assets/images/icon.png">

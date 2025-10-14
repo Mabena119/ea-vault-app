@@ -372,7 +372,7 @@ export default function QuotesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
   },
   header: {
     flexDirection: 'row',
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#8a2a3c',
+    borderBottomColor: '#6ba3bb',
   },
   backButton: {
     marginRight: 16,
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   retryButton: {
-    backgroundColor: '#6b1e2f',
+    backgroundColor: '#5a8fa5',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -493,12 +493,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   quoteCard: {
-    backgroundColor: '#8a2a3c',
+    backgroundColor: '#6ba3bb',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#6b1e2f',
+    borderColor: '#5a8fa5',
   },
   quoteHeader: {
     flexDirection: 'row',

@@ -311,7 +311,7 @@ export default function RootLayout() {
   }, []);
 
   if (!appIsReady) {
-    return <CustomLoadingScreen message="Initializing EA Migrate..." />;
+    return <CustomLoadingScreen message="Initializing EA Vault..." />;
   }
 
   return (

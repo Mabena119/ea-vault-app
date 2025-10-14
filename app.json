@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "EA Migrate",
+    "name": "EA Vault",
     "slug": "ea-vault-app-bf6qtmx7-6jkhyg7w",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -67,14 +67,14 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
-      "name": "EA Migrate",
-      "shortName": "EA Migrate",
+      "name": "EA Vault",
+      "shortName": "EA Vault",
       "startUrl": "/",
       "display": "standalone",
       "orientation": "portrait",
       "themeColor": "#000000",
       "backgroundColor": "#000000",
-      "description": "Automated Forex Trading EA Migrate App",
+      "description": "Automated Forex Trading EA Vault App",
       "scope": "/",
       "lang": "en",
       "categories": [

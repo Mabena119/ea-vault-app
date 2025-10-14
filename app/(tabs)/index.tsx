@@ -93,7 +93,7 @@ export default function HomeScreen() {
               style={{ width: 120, height: 120, borderRadius: 24 }}
               resizeMode="contain"
             />
-            <Text style={styles.title}>EA MIGRATE</Text>
+            <Text style={styles.title}>EA VAULT</Text>
           </View>
 
           <Text style={styles.description}>
@@ -351,7 +351,7 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
   },
   splashContent: {
     flex: 1,
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
   },
   content: {
     flex: 1,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   heroFallback: {
     width: '100%',
     height: 500,
-    backgroundColor: '#8a2a3c',
+    backgroundColor: '#6ba3bb',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     position: 'relative',
     marginTop: 0,
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
     overflow: 'hidden',
     zIndex: 10,
   },

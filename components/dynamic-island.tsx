@@ -433,7 +433,7 @@ export function DynamicIsland({ visible, newSignal, onSignalDismiss }: DynamicIs
                   {primaryEA?.name}
                 </Text>
                 <Text style={styles.expandedSubtitle}>
-                  EA MIGRATE
+                  EA VAULT
                 </Text>
               </View>
             </View>
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#a83248',
+    backgroundColor: '#86bcd1',
     overflow: 'hidden',
   },
   collapsedLogo: {
