@@ -544,9 +544,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
   },
   tradeButtonActive: {
-    backgroundColor: 'rgba(220, 38, 38, 0.6)',
+    backgroundColor: 'rgba(90, 143, 165, 0.6)',
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    shadowColor: '#DC2626',
+    shadowColor: '#5a8fa5',
     shadowOpacity: 0.2,
   },
   secondaryButton: {
