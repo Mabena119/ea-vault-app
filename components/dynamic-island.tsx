@@ -452,11 +452,11 @@ export function DynamicIsland({ visible, newSignal, onSignalDismiss }: DynamicIs
                 }}
               >
                 {isBotActive ? (
-                  <Square color="#DC2626" size={16} fill="#DC2626" />
+                  <Square color="#86bcd1" size={16} fill="#86bcd1" />
                 ) : (
                   <Play color="#FFFFFF" size={16} fill="#FFFFFF" />
                 )}
-                <Text style={[styles.controlButtonText, { color: isBotActive ? "#DC2626" : "#FFFFFF" }]}>
+                <Text style={[styles.controlButtonText, { color: isBotActive ? "#86bcd1" : "#FFFFFF" }]}>
                   {isBotActive ? 'STOP' : 'START'}
                 </Text>
               </TouchableOpacity>
