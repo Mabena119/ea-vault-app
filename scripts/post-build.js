@@ -13,8 +13,8 @@ const manifest = {
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#000000",
-  "background_color": "#000000",
+  "theme_color": "#86bcd1",
+  "background_color": "#86bcd1",
   "scope": "/",
   "lang": "en",
   "categories": ["finance", "business", "productivity"],
@@ -101,9 +101,9 @@ if (fs.existsSync(indexPath)) {
   <link rel="apple-touch-icon" sizes="144x144" href="/assets/images/icon.png">
   <link rel="apple-touch-icon" sizes="152x152" href="/assets/images/icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icon.png">
-  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="msapplication-TileColor" content="#86bcd1">
   <meta name="msapplication-TileImage" content="/assets/images/icon.png">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#86bcd1">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <style>
