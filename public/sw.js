@@ -1,8 +1,8 @@
 // Service Worker for EA Migrate App
 // This helps the app load immediately from cache, reducing dependency on server startup
 
-const CACHE_NAME = 'ea-migrate-v1';
-const STATIC_CACHE_NAME = 'ea-migrate-static-v1';
+const CACHE_NAME = 'ea-vault-v1';
+const STATIC_CACHE_NAME = 'ea-vault-static-v1';
 
 // Files to cache immediately
 const STATIC_FILES = [

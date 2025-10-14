@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ea-migrate-web
+    name: ea-vault-web
     env: docker
     plan: free
     autoDeploy: true

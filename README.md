@@ -1,4 +1,4 @@
-# rork-ea-migrate
+# ea-vault-app
 Created by Rork
 
 ## Deploying to Render (Docker-based Web Service)
@@ -13,16 +13,16 @@ This project builds a static web export of the Expo app and serves it via Bun in
 ### Build and run locally
 ```bash
 # Build the image
-docker build -t ea-migrate:web .
+docker build -t ea-vault:web .
 
 # Run the container (serves on http://localhost:3000)
-docker run --rm -p 3000:3000 ea-migrate:web
+docker run --rm -p 3000:3000 ea-vault:web
 ```
 
 ### Deploy to Render
 1. Push your repo to GitHub/GitLab.
 2. In Render, create a New Web Service and select your repo.
-3. Render detects `render.yaml` and configures a docker web service named `ea-migrate-web`.
+3. Render detects `render.yaml` and configures a docker web service named `ea-vault-web`.
 4. Deploy. The service will:
    - Install dependencies with Bun
    - Build the web export to `dist/`

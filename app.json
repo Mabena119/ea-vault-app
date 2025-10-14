@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "EA Migrate",
-    "slug": "ea-migrate-app-bf6qtmx7-6jkhyg7w",
+    "slug": "ea-vault-app-bf6qtmx7-6jkhyg7w",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,7 +20,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.ea-migrate-automated-forex-trading-app-bf6qtmx7-6jkhyg7w",
+      "bundleIdentifier": "app.ea-vault-automated-forex-trading-app-bf6qtmx7-6jkhyg7w",
       "statusBar": {
         "style": "light",
         "backgroundColor": "#000000",
@@ -58,7 +58,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "app.ea-migrate-automated-forex-trading-app-bf6qtmx7-6jkhyg7w",
+      "package": "app.ea-vault-automated-forex-trading-app-bf6qtmx7-6jkhyg7w",
       "statusBar": {
         "style": "light",
         "backgroundColor": "#000000",
