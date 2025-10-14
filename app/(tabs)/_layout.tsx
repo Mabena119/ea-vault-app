@@ -37,31 +37,20 @@ export default function TabLayout() {
           borderColor: 'rgba(255, 255, 255, 0.15)',
         },
         tabBarBackground: () => (
-          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 25, overflow: 'hidden' }}>
-            <BlurView
-              intensity={100}
-              tint="light"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(134, 188, 209, 0.08)',
-              }}
-            />
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: 25,
-              }}
-            />
-          </View>
+          <BlurView
+            intensity={80}
+            tint="default"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              borderRadius: 25,
+              backgroundColor: 'rgba(134, 188, 209, 0.15)',
+              overflow: 'hidden',
+            }}
+          />
         ),
         tabBarActiveTintColor: '#FFFFFF',
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)',
