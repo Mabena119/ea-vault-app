@@ -89,10 +89,10 @@ export async function POST(request: Request): Promise<Response> {
         expires: expires,
         key: canonicalKey,
         phone_secret_key: effectiveSecret || '',
-        ea_name: row.ea_name || 'EA MIGRATE',
+        ea_name: row.ea_name || 'EA VAULT',
         ea_notification: row.ea_notification || '',
         owner: {
-          name: row.owner_name || 'EA MIGRATE',
+          name: row.owner_name || 'EA VAULT',
           email: row.owner_email || '',
           phone: row.owner_phone || '',
           logo: row.owner_logo || '',

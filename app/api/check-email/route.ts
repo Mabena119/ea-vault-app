@@ -13,7 +13,7 @@ export async function POST(request: Request): Promise<Response> {
         const conn = await pool.getConnection();
         try {
             const [rows] = await conn.execute(
-                'SELECT id, email, paid, used FROM membersc WHERE email = ? LIMIT 1',
+                'SELECT id, email, paid, used FROM membersd WHERE email = ? LIMIT 1',
                 [email]
             );
 
@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
 
             // If it's the user's first login (used=0), mark as used immediately
             if (used === 0) {
-                await conn.execute('UPDATE membersc SET used = 1 WHERE email = ?', [email]);
+                await conn.execute('UPDATE membersd SET used = 1 WHERE email = ?', [email]);
                 used = 0;
             }
 

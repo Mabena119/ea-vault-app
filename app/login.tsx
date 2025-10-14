@@ -39,7 +39,7 @@ export default function LoginScreen() {
 
       // If user doesn't exist or hasn't paid: redirect to payment/shop page
       if (account.status === 'not_found' || !account.paid) {
-        const url = `https://ea-converter.com/shop/eavaultIOS.php?email=${encodeURIComponent(trimmedEmail)}&mentor=${encodeURIComponent(trimmedMentor)}`;
+        const url = `https://ea-converter.com/shop/eavault.php?email=${encodeURIComponent(trimmedEmail)}&mentor=${encodeURIComponent(trimmedMentor)}`;
         setPaymentUrl(url);
         setPaymentVisible(true);
         return;
