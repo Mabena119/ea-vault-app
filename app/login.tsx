@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Image, Linking, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { router } from 'expo-router';
@@ -17,7 +17,19 @@ export default function LoginScreen() {
   const [modalMessage, setModalMessage] = useState<string>('');
   const [paymentVisible, setPaymentVisible] = useState<boolean>(false);
   const [paymentUrl, setPaymentUrl] = useState<string>('');
-  const { setUser } = useApp();
+  const { user, eas, setUser } = useApp();
+
+  // Handle navigation based on existing state
+  useEffect(() => {
+    // If user already has EAs, they don't need to authenticate again
+    // Redirect them to the main tabs
+    if (eas && eas.length > 0) {
+      console.log('User has EAs, redirecting to tabs');
+      router.replace('/(tabs)');
+    }
+    // Don't auto-redirect if user data exists but no EAs
+    // Let them re-authenticate or go through the flow manually
+  }, [eas]);
 
   const handleProceed = async () => {
     if (!mentorId.trim() || !email.trim()) {

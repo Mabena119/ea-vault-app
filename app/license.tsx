@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
@@ -8,11 +8,22 @@ import { apiService } from '@/services/api';
 export default function LicenseScreen() {
   const [licenseKey, setLicenseKey] = useState<string>('');
   const [isActivating, setIsActivating] = useState<boolean>(false);
-  const { addEA, eas } = useApp();
+  const { user, addEA, eas } = useApp();
   const hasActiveBots = eas.length > 0;
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalTitle, setModalTitle] = useState<string>('');
   const [modalMessage, setModalMessage] = useState<string>('');
+
+  // Handle navigation based on existing state
+  useEffect(() => {
+    // If user has EAs, they can stay on this screen to add more
+    // If user has authenticated via email, they can stay on this screen
+    // Only redirect to login if neither condition is met
+    if (!user && !hasActiveBots) {
+      console.log('No user authenticated and no EAs, redirecting to login');
+      router.replace('/login');
+    }
+  }, [user, hasActiveBots]);
 
   const handleActivate = async () => {
     if (!licenseKey.trim()) {
@@ -74,6 +85,8 @@ export default function LicenseScreen() {
 
       const success = await addEA(newEA);
       if (success) {
+        // Clear the license key input
+        setLicenseKey('');
         await new Promise(resolve => setTimeout(resolve, 300));
         router.replace('/(tabs)');
       } else {
