@@ -135,11 +135,17 @@ class DatabaseSignalsPollingService {
     }, 30000); // Check every 30 seconds
   }
 
-  // Real database polling
+  // Real database polling - optimized to reduce server load
   private startRealPolling(licenseKey: string) {
     console.log('Starting real database signals polling for license:', licenseKey);
 
-    // Check for signals every 10 seconds
+    // Initial check
+    this.checkForNewSignals(licenseKey).catch(error => {
+      console.error('Error in initial signal check:', error);
+    });
+
+    // Check for signals every 30 seconds instead of 10 (reduced from 6 req/min to 2 req/min)
+    // This significantly reduces database load while still providing timely updates
     this.intervalId = setInterval(async () => {
       try {
         await this.checkForNewSignals(licenseKey);
@@ -149,7 +155,7 @@ class DatabaseSignalsPollingService {
           this.onError(`Database error: ${error}`);
         }
       }
-    }, 10000); // Check every 10 seconds
+    }, 30000); // Check every 30 seconds (optimized from 10s)
   }
 
   // Check for new signals in database
@@ -189,14 +195,27 @@ class DatabaseSignalsPollingService {
     }
   }
 
-  // Get EA from license key via API
+  // Get EA from license key via API (with caching to reduce API calls)
+  private eaCache: Map<string, { ea: string | null, timestamp: number }> = new Map();
+  private EA_CACHE_TTL = 300000; // 5 minutes - EA rarely changes
+
   private async getEAFromLicense(licenseKey: string): Promise<string | null> {
     try {
+      // Check cache first
+      const cached = this.eaCache.get(licenseKey);
+      if (cached && (Date.now() - cached.timestamp) < this.EA_CACHE_TTL) {
+        return cached.ea;
+      }
+
       const response = await fetch(`/api/get-ea-from-license?licenseKey=${encodeURIComponent(licenseKey)}`);
       if (!response.ok) {
         throw new Error(`API call failed: ${response.status}`);
       }
       const data = await response.json();
+      
+      // Cache the result
+      this.eaCache.set(licenseKey, { ea: data.eaId, timestamp: Date.now() });
+      
       return data.eaId;
     } catch (error) {
       console.error('Error fetching EA from license via API:', error);
@@ -204,22 +223,51 @@ class DatabaseSignalsPollingService {
     }
   }
 
-  // Get new signals for EA since last poll
+  // Get new signals for EA since last poll (optimized with exponential backoff on errors)
+  private consecutiveErrors = 0;
+  private maxConsecutiveErrors = 3;
+
   private async getNewSignalsForEA(ea: string): Promise<DatabaseSignal[]> {
     try {
       const params = new URLSearchParams({
         eaId: ea,
-        since: this.lastPollTime || new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // Default to 24 hours ago
+        since: this.lastPollTime || new Date(Date.now() - 60 * 60 * 1000).toISOString() // Default to 1 hour ago (reduced from 24h)
       });
 
-      const response = await fetch(`/api/get-new-signals?${params}`);
+      const response = await fetch(`/api/get-new-signals?${params}`, {
+        // Add timeout to prevent hanging requests
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
+      
       if (!response.ok) {
         throw new Error(`API call failed: ${response.status}`);
       }
+      
       const data = await response.json();
+      
+      // Reset error counter on success
+      this.consecutiveErrors = 0;
+      
       return data.signals;
     } catch (error) {
-      console.error('Error fetching new signals via API:', error);
+      this.consecutiveErrors++;
+      console.error(`Error fetching new signals via API (attempt ${this.consecutiveErrors}):`, error);
+      
+      // Implement exponential backoff if too many errors
+      if (this.consecutiveErrors >= this.maxConsecutiveErrors) {
+        console.warn('Too many consecutive errors, temporarily pausing polling');
+        this.stopPolling();
+        
+        // Auto-restart after 5 minutes
+        setTimeout(() => {
+          if (this.currentLicenseKey) {
+            console.log('Restarting polling after error cooldown');
+            this.consecutiveErrors = 0;
+            this.startPolling(this.currentLicenseKey, this.onSignalFound, this.onError);
+          }
+        }, 300000); // 5 minutes
+      }
+      
       throw new Error('Failed to fetch new signals');
     }
   }

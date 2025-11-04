@@ -11,24 +11,86 @@ declare const Bun: any;
 const DIST_DIR = path.join(process.cwd(), 'dist');
 const PORT = Number(process.env.PORT || 3000);
 
-// Database configuration
+// Database configuration - prefer environment variables
 const dbConfig = {
-  host: '172.203.148.37.host.secureserver.net',
-  user: 'eauser',
-  password: 'snVO2i%fZSG%',
-  database: 'eaconverter',
-  port: 3306,
-  connectTimeout: 60000,
-  acquireTimeout: 60000,
-  timeout: 60000,
+  host: process.env.DB_HOST || process.env.MYSQLHOST || '172.203.148.37.host.secureserver.net',
+  user: process.env.DB_USER || process.env.MYSQLUSER || 'eauser',
+  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || 'snVO2i%fZSG%',
+  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'eaconverter',
+  port: Number(process.env.DB_PORT || process.env.MYSQLPORT || 3306),
+  // Optimized connection pool settings
+  connectionLimit: 50, // Increased from default
+  waitForConnections: true,
+  queueLimit: 100, // Limit queue size
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+  maxIdle: 20,
+  idleTimeout: 60000, // 1 minute
+  connectTimeout: 10000, // 10 seconds
+  acquireTimeout: 10000, // 10 seconds
+  timeout: 30000, // 30 second query timeout
 };
 
-// Create database connection pool
+// Create optimized database connection pool
 const pool = createPool(dbConfig);
+
+// Simple in-memory cache for database queries
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+}
+
+const queryCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 30000; // 30 seconds
+
+function getCachedQuery(key: string): any | null {
+  const entry = queryCache.get(key);
+  if (entry && (Date.now() - entry.timestamp) < CACHE_TTL) {
+    return entry.data;
+  }
+  if (entry) {
+    queryCache.delete(key);
+  }
+  return null;
+}
+
+function setCachedQuery(key: string, data: any): void {
+  queryCache.set(key, { data, timestamp: Date.now() });
+  // Limit cache size
+  if (queryCache.size > 500) {
+    const firstKey = queryCache.keys().next().value;
+    if (firstKey) {
+      queryCache.delete(firstKey);
+    }
+  }
+}
+
+// Clean cache periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of queryCache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL * 2) {
+      queryCache.delete(key);
+    }
+  }
+}, 60000);
 
 function getPool() {
   return pool;
 }
+
+// Health monitoring
+pool.on('connection', (connection) => {
+  console.log('Database connection established');
+});
+
+pool.on('acquire', () => {
+  // Connection acquired from pool
+});
+
+pool.on('release', () => {
+  // Connection released back to pool
+});
 
 async function serveStatic(request: Request): Promise<Response> {
   try {
@@ -1212,18 +1274,38 @@ async function handleApi(request: Request): Promise<Response> {
         }
 
         try {
-          const pool = getPool();
-          const [rows] = await pool.execute(
-            'SELECT ea FROM licences WHERE k_ey = ? LIMIT 1',
-            [licenseKey]
-          );
+          // Check cache first
+          const cacheKey = `ea_license_${licenseKey}`;
+          const cached = getCachedQuery(cacheKey);
+          if (cached) {
+            return new Response(JSON.stringify(cached), {
+              headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT' },
+            });
+          }
 
-          const result = rows as any[];
-          return new Response(JSON.stringify({
-            eaId: result.length > 0 ? result[0].ea : null
-          }), {
-            headers: { 'Content-Type': 'application/json' },
-          });
+          const pool = getPool();
+          const conn = await pool.getConnection();
+          
+          try {
+            const [rows] = await conn.execute(
+              'SELECT ea FROM licences WHERE k_ey = ? LIMIT 1',
+              [licenseKey]
+            );
+
+            const result = rows as any[];
+            const responseData = {
+              eaId: result.length > 0 ? result[0].ea : null
+            };
+
+            // Cache the result
+            setCachedQuery(cacheKey, responseData);
+
+            return new Response(JSON.stringify(responseData), {
+              headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS' },
+            });
+          } finally {
+            conn.release();
+          }
         } catch (error) {
           console.error('Database error:', error);
           return new Response(JSON.stringify({ error: 'Database error' }), {
@@ -1249,38 +1331,63 @@ async function handleApi(request: Request): Promise<Response> {
         }
 
         try {
-          const pool = getPool();
-          let query: string;
-          let params: any[];
-
-          if (since) {
-            // Get signals since a specific time
-            query = `
-              SELECT id, ea, asset, latestupdate, type, action, price, tp, sl, time, results
-              FROM \`signals\` 
-              WHERE ea = ? AND latestupdate > ? AND results = 'active'
-              ORDER BY latestupdate DESC
-            `;
-            params = [eaId, since];
-          } else {
-            // Get all active signals for EA
-            query = `
-              SELECT id, ea, asset, latestupdate, type, action, price, tp, sl, time, results
-              FROM \`signals\` 
-              WHERE ea = ? AND results = 'active'
-              ORDER BY latestupdate DESC
-            `;
-            params = [eaId];
+          // Shorter cache TTL for signals (5 seconds) since they update frequently
+          const cacheKey = `signals_${eaId}_${since || 'all'}`;
+          const cached = getCachedQuery(cacheKey);
+          if (cached) {
+            return new Response(JSON.stringify(cached), {
+              headers: { 'Content-Type': 'application/json', 'X-Cache': 'HIT' },
+            });
           }
 
-          const [rows] = await pool.execute(query, params);
+          const pool = getPool();
+          const conn = await pool.getConnection();
 
-          const result = rows as any[];
-          console.log(`Found ${result.length} new signals for EA ${eaId} since ${since || 'beginning'}`);
+          try {
+            let query: string;
+            let params: any[];
 
-          return new Response(JSON.stringify({ signals: result }), {
-            headers: { 'Content-Type': 'application/json' },
-          });
+            if (since) {
+              // Get signals since a specific time
+              query = `
+                SELECT id, ea, asset, latestupdate, type, action, price, tp, sl, time, results
+                FROM \`signals\` 
+                WHERE ea = ? AND latestupdate > ? AND results = 'active'
+                ORDER BY latestupdate DESC
+                LIMIT 100
+              `;
+              params = [eaId, since];
+            } else {
+              // Get all active signals for EA
+              query = `
+                SELECT id, ea, asset, latestupdate, type, action, price, tp, sl, time, results
+                FROM \`signals\` 
+                WHERE ea = ? AND results = 'active'
+                ORDER BY latestupdate DESC
+                LIMIT 100
+              `;
+              params = [eaId];
+            }
+
+            const [rows] = await conn.execute(query, params);
+
+            const result = rows as any[];
+            console.log(`Found ${result.length} new signals for EA ${eaId} since ${since || 'beginning'}`);
+
+            const responseData = { signals: result };
+
+            // Cache with shorter TTL for signals (5 seconds)
+            queryCache.set(cacheKey, { data: responseData, timestamp: Date.now() });
+            
+            // Auto-clean this specific cache entry after 5 seconds
+            setTimeout(() => queryCache.delete(cacheKey), 5000);
+
+            return new Response(JSON.stringify(responseData), {
+              headers: { 'Content-Type': 'application/json', 'X-Cache': 'MISS' },
+            });
+          } finally {
+            conn.release();
+          }
         } catch (error) {
           console.error('Database error:', error);
           return new Response(JSON.stringify({ error: 'Database error' }), {
