@@ -14,22 +14,7 @@ export default function LicenseScreen() {
   const [modalTitle, setModalTitle] = useState<string>('');
   const [modalMessage, setModalMessage] = useState<string>('');
 
-  // Strict authentication check - must have email auth or existing EAs
-  useEffect(() => {
-    const hasEmailAuth = user !== null;
-    
-    console.log('📄 License Screen Auth Check:', {
-      hasEmailAuth,
-      hasActiveBots,
-      userEmail: user?.email || 'none'
-    });
-
-    // MUST have email authentication OR existing EAs to stay on this screen
-    if (!hasEmailAuth && !hasActiveBots) {
-      console.log('🚫 No authentication - redirecting to login');
-      router.replace('/login');
-    }
-  }, [user, hasActiveBots, router]);
+  // Navigation is handled by root layout - no redirects needed here
 
   const handleActivate = async () => {
     if (!licenseKey.trim()) {

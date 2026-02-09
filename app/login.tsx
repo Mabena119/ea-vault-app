@@ -20,20 +20,7 @@ export default function LoginScreen() {
   const [paymentUrl, setPaymentUrl] = useState<string>('');
   const { user, eas, setUser, isFirstTime, setIsFirstTime } = useApp();
 
-  // Handle navigation based on existing state
-  useEffect(() => {
-    // If user already has EAs, they don't need to authenticate again
-    // Redirect them to the main tabs
-    if (eas && eas.length > 0) {
-      console.log('User has EAs, redirecting to tabs');
-      router.replace('/(tabs)');
-    }
-    // If user has email auth but no EAs, redirect to license
-    else if (user && !eas.length) {
-      console.log('User has email auth, redirecting to license');
-      router.replace('/license');
-    }
-  }, [eas, user]);
+  // Navigation is handled by root layout - no redirects needed here
 
   const handleBack = () => {
     // Go back to start page (splash screen)

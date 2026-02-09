@@ -146,57 +146,91 @@ function RootLayoutNav() {
     setIsFirstTime
   } = useApp();
   const [appState, setAppState] = useState<string>(AppState.currentState);
+  const [navigationReady, setNavigationReady] = useState<boolean>(false);
   const segments = useSegments();
   const router = useRouter();
 
-  // Solid authentication flow
+  // Initial routing on app open - runs once when app data is loaded
   useEffect(() => {
+    // Wait for navigation to be ready
+    if (!navigationReady) {
+      setNavigationReady(true);
+      return;
+    }
+
+    const hasEAs = eas && eas.length > 0;
+    const hasEmailAuth = user !== null;
+
+    console.log('🚀 Initial App Routing:', {
+      isFirstTime,
+      hasEAs,
+      hasEmailAuth,
+      userEmail: user?.email || 'none',
+      easCount: eas?.length || 0
+    });
+
+    // DECISION TREE ON APP OPEN:
+    // 1. Has EAs (licenses) → Go to main tabs (fully authenticated)
+    if (hasEAs) {
+      console.log('✅ Has licenses - routing to main tabs');
+      router.replace('/(tabs)');
+      return;
+    }
+
+    // 2. Has email auth but no EAs → Go to license screen
+    if (hasEmailAuth && !hasEAs) {
+      console.log('📧 Email authenticated - routing to license screen');
+      router.replace('/license');
+      return;
+    }
+
+    // 3. First time (no auth, no EAs) → Stay on start page
+    if (isFirstTime && !hasEmailAuth && !hasEAs) {
+      console.log('📱 First time - showing start page');
+      // Stay on start page (home tab with splash)
+      return;
+    }
+
+    // 4. Not first time, no auth → Go to login screen
+    if (!isFirstTime && !hasEmailAuth && !hasEAs) {
+      console.log('🔒 Not authenticated - routing to login');
+      router.replace('/login');
+      return;
+    }
+  }, [navigationReady, eas, user, isFirstTime]);
+
+  // Continuous authentication guard during navigation
+  useEffect(() => {
+    if (!navigationReady) return;
+
     const hasEAs = eas && eas.length > 0;
     const hasEmailAuth = user !== null;
     const currentSegment = segments[0];
 
-    console.log('🔐 Auth Flow Check:', {
-      isFirstTime,
+    console.log('🔐 Navigation Guard:', {
+      currentSegment,
       hasEAs,
       hasEmailAuth,
-      currentSegment,
-      userEmail: user?.email || 'none'
     });
 
-    // FLOW 1: First time - show start page (splash screen)
-    if (isFirstTime) {
-      console.log('📱 First time - staying on start page');
-      // User is on start page, they can navigate to login manually
+    // Prevent accessing license screen without email auth
+    if (currentSegment === 'license' && !hasEmailAuth && !hasEAs) {
+      console.log('🚫 Cannot access license without email auth');
+      router.replace('/login');
       return;
     }
 
-    // FLOW 2: Has EAs - go to main tabs (fully authenticated)
-    if (hasEAs) {
-      if (currentSegment !== '(tabs)' && currentSegment !== 'trade-config') {
-        console.log('✅ Has EAs - redirecting to tabs');
-        router.replace('/(tabs)');
-      }
-      return;
-    }
-
-    // FLOW 3: Has email auth but no EAs - must be on license screen
-    if (hasEmailAuth && !hasEAs) {
-      if (currentSegment !== 'license') {
-        console.log('📧 Email authenticated - redirecting to license screen');
+    // Prevent accessing main tabs without EAs
+    if (currentSegment === '(tabs)' && !hasEAs && !isFirstTime) {
+      console.log('🚫 Cannot access tabs without licenses');
+      if (hasEmailAuth) {
         router.replace('/license');
-      }
-      return;
-    }
-
-    // FLOW 4: No auth at all - must be on login screen
-    if (!hasEmailAuth && !hasEAs) {
-      if (currentSegment !== 'login') {
-        console.log('🔒 Not authenticated - redirecting to login');
+      } else {
         router.replace('/login');
       }
       return;
     }
-  }, [isFirstTime, eas, user, segments, router]);
+  }, [navigationReady, eas, user, segments, isFirstTime, router]);
 
   // Debug TradingWebView state changes
   useEffect(() => {
