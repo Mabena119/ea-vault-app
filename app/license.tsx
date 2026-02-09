@@ -14,16 +14,22 @@ export default function LicenseScreen() {
   const [modalTitle, setModalTitle] = useState<string>('');
   const [modalMessage, setModalMessage] = useState<string>('');
 
-  // Handle navigation based on existing state
+  // Strict authentication check - must have email auth or existing EAs
   useEffect(() => {
-    // If user has EAs, they can stay on this screen to add more
-    // If user has authenticated via email, they can stay on this screen
-    // Only redirect to login if neither condition is met
-    if (!user && !hasActiveBots) {
-      console.log('No user authenticated and no EAs, redirecting to login');
+    const hasEmailAuth = user !== null;
+    
+    console.log('📄 License Screen Auth Check:', {
+      hasEmailAuth,
+      hasActiveBots,
+      userEmail: user?.email || 'none'
+    });
+
+    // MUST have email authentication OR existing EAs to stay on this screen
+    if (!hasEmailAuth && !hasActiveBots) {
+      console.log('🚫 No authentication - redirecting to login');
       router.replace('/login');
     }
-  }, [user, hasActiveBots]);
+  }, [user, hasActiveBots, router]);
 
   const handleActivate = async () => {
     if (!licenseKey.trim()) {
@@ -131,6 +137,12 @@ export default function LicenseScreen() {
                 resizeMode="contain"
               />
               <Text style={styles.title}>Enter License Key</Text>
+              {user && (
+                <View style={styles.authBanner}>
+                  <Text style={styles.authBannerLabel}>Authenticated as:</Text>
+                  <Text style={styles.authBannerEmail}>{user.email}</Text>
+                </View>
+              )}
             </View>
 
             <View style={styles.form}>
@@ -222,6 +234,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginTop: 16,
+  },
+  authBanner: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    alignItems: 'center',
+  },
+  authBannerLabel: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  authBannerEmail: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   form: {
     width: '100%',

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Image, Linking, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { router } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
 // Networking disabled: avoid external browser/payment flows
 import { useApp } from '@/providers/app-provider';
 import { apiService } from '@/services/api';
@@ -17,7 +18,7 @@ export default function LoginScreen() {
   const [modalMessage, setModalMessage] = useState<string>('');
   const [paymentVisible, setPaymentVisible] = useState<boolean>(false);
   const [paymentUrl, setPaymentUrl] = useState<string>('');
-  const { user, eas, setUser } = useApp();
+  const { user, eas, setUser, isFirstTime, setIsFirstTime } = useApp();
 
   // Handle navigation based on existing state
   useEffect(() => {
@@ -27,9 +28,18 @@ export default function LoginScreen() {
       console.log('User has EAs, redirecting to tabs');
       router.replace('/(tabs)');
     }
-    // Don't auto-redirect if user data exists but no EAs
-    // Let them re-authenticate or go through the flow manually
-  }, [eas]);
+    // If user has email auth but no EAs, redirect to license
+    else if (user && !eas.length) {
+      console.log('User has email auth, redirecting to license');
+      router.replace('/license');
+    }
+  }, [eas, user]);
+
+  const handleBack = () => {
+    // Go back to start page (splash screen)
+    setIsFirstTime(true);
+    router.replace('/(tabs)');
+  };
 
   const handleProceed = async () => {
     if (!mentorId.trim() || !email.trim()) {
@@ -92,6 +102,12 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+          <ArrowLeft size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Back to Start</Text>
+      </View>
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -204,6 +220,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#86bcd1',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 12,
   },
   keyboardAvoidingView: {
     flex: 1,
